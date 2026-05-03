@@ -2,4 +2,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/realwibm/public_html/
-    - /bin/rsync -av --delete --exclude='.git/' --exclude='.gitignore' --exclude='.cpanel.yml' --exclude='README.md' --exclude='node_modules/' ./ $DEPLOYPATH
+    - /bin/rsync -av --delete --exclude='.well-known/' ./dist/ $DEPLOYPATH

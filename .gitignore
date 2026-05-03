@@ -18,9 +18,12 @@ desktop.ini
 .env.local
 .env.*.local
 
-# Dependencies (if tooling is added later)
+# Dependencies
 node_modules/
 
-# Build output (uncomment if you add a build step)
-# dist/
-# build/
+# Vite cache
+.vite/
+
+# NOTE: dist/ is intentionally NOT ignored — cPanel git deploy needs the
+# committed build output to rsync into public_html (see .cpanel.yml).
+# Run `npm run build` before each `git push`.

@@ -1,0 +1,70 @@
+# ─── realdealcpa.ai · Apache config (cPanel) ─────────────────────────
+
+# 1. Force HTTPS — cPanel/AutoSSL handles the cert.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# 2. Custom 404 page.
+ErrorDocument 404 /404.html
+
+# 3. Strip trailing index.html so canonical URLs are folder-trailing-slash.
+<IfModule mod_rewrite.c>
+  RewriteCond %{THE_REQUEST} \s/+([^\s?]*?)/?index\.html[\s?]
+  RewriteRule ^ /%1/ [R=301,L]
+</IfModule>
+
+# 4. Compression (gzip / brotli when available).
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript application/json image/svg+xml application/xml
+</IfModule>
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css application/javascript application/json image/svg+xml application/xml
+</IfModule>
+
+# 5. Cache headers — Vite hashes asset filenames so they can be cached forever.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault                              "access plus 1 hour"
+
+  # HTML — short cache so deploys are picked up quickly.
+  ExpiresByType text/html                     "access plus 5 minutes"
+
+  # Hashed assets — fingerprinted, safe to cache for a year.
+  <FilesMatch "\.(js|css|woff2?)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Images.
+  ExpiresByType image/svg+xml                 "access plus 1 month"
+  ExpiresByType image/png                     "access plus 1 month"
+  ExpiresByType image/jpeg                    "access plus 1 month"
+  ExpiresByType image/webp                    "access plus 1 month"
+  ExpiresByType image/avif                    "access plus 1 month"
+  ExpiresByType image/x-icon                  "access plus 1 month"
+
+  # Manifests / data.
+  ExpiresByType application/json              "access plus 5 minutes"
+  ExpiresByType application/xml               "access plus 1 day"
+  ExpiresByType text/xml                      "access plus 1 day"
+</IfModule>
+
+# 6. Security headers.
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+  Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# 7. MIME types Apache may not know about by default.
+<IfModule mod_mime.c>
+  AddType image/svg+xml .svg
+  AddType application/manifest+json .webmanifest
+  AddType font/woff2 .woff2
+</IfModule>
+
+# 8. Disable directory listing.
+Options -Indexes

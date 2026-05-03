@@ -78,7 +78,71 @@ document.querySelectorAll('[data-nav]').forEach((link) => {
   }
 })
 
+/* ─── Mobile menu ──────────────────────────────────────────────────── */
+
+const toggleBtn = document.querySelector('[data-menu-toggle]')
+if (toggleBtn) {
+  const overlay = document.createElement('div')
+  overlay.className = 'mobile-menu'
+  overlay.setAttribute('aria-hidden', 'true')
+  overlay.innerHTML = `
+    <div class="mobile-menu-backdrop" data-menu-backdrop></div>
+    <div class="mobile-menu-panel glass-strong">
+      <ul class="flex flex-col">
+        <li><a href="/" data-nav="/" class="mobile-link">Home<svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a></li>
+        <li><a href="/services/" data-nav="/services" class="mobile-link">Services<svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a></li>
+        <li><a href="/builds/" data-nav="/builds" class="mobile-link">Builds<svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a></li>
+        <li><a href="/gallery/" data-nav="/gallery" class="mobile-link">Gallery<svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a></li>
+        <li><a href="/notes/" data-nav="/notes" class="mobile-link">Notes<svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a></li>
+      </ul>
+      <a href="/services/#contact" class="btn btn-primary mt-7 w-full justify-center">
+        Work with me
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>`
+  document.body.appendChild(overlay)
+
+  // Mark active link in mobile menu
+  overlay.querySelectorAll('[data-nav]').forEach((link) => {
+    const target = link.getAttribute('data-nav')
+    if (
+      (target === '/' && path === '/') ||
+      (target !== '/' && path.startsWith(target))
+    ) {
+      link.classList.add('is-active')
+    }
+  })
+
+  const iconOpen = toggleBtn.querySelector('[data-icon-open]')
+  const iconClose = toggleBtn.querySelector('[data-icon-close]')
+
+  const open = () => {
+    overlay.classList.add('is-open')
+    overlay.setAttribute('aria-hidden', 'false')
+    document.body.style.overflow = 'hidden'
+    toggleBtn.setAttribute('aria-expanded', 'true')
+    iconOpen?.classList.add('hidden')
+    iconClose?.classList.remove('hidden')
+  }
+  const close = () => {
+    overlay.classList.remove('is-open')
+    overlay.setAttribute('aria-hidden', 'true')
+    document.body.style.overflow = ''
+    toggleBtn.setAttribute('aria-expanded', 'false')
+    iconOpen?.classList.remove('hidden')
+    iconClose?.classList.add('hidden')
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    overlay.classList.contains('is-open') ? close() : open()
+  })
+  overlay.querySelector('[data-menu-backdrop]').addEventListener('click', close)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('is-open')) close()
+  })
+}
+
 /* ─── Year stamp in footer ─────────────────────────────────────────── */
 
-const yearEl = document.querySelector('[data-year]')
-if (yearEl) yearEl.textContent = new Date().getFullYear()
+const yearEl = document.querySelectorAll('[data-year]')
+yearEl.forEach((el) => (el.textContent = new Date().getFullYear()))

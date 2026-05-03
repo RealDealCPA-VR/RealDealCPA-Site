@@ -14,6 +14,7 @@ export default defineConfig({
         builds:   r('./builds/index.html'),
         gallery:  r('./gallery/index.html'),
         notes:    r('./notes/index.html'),
+        notFound: r('./404.html'),
       },
     },
   },

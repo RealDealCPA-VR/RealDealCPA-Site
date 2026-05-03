@@ -142,6 +142,90 @@ if (toggleBtn) {
   })
 }
 
+/* ─── Lightbox ─────────────────────────────────────────────────────── */
+
+const lightboxTriggers = document.querySelectorAll('[data-lightbox]')
+if (lightboxTriggers.length) {
+  const items = Array.from(lightboxTriggers).map((el) => ({
+    src: el.dataset.src,
+    title: el.dataset.title || '',
+    series: el.dataset.series || '',
+  }))
+  let i = 0
+  let lastFocused = null
+
+  const lb = document.createElement('div')
+  lb.className = 'lightbox'
+  lb.setAttribute('aria-hidden', 'true')
+  lb.setAttribute('role', 'dialog')
+  lb.setAttribute('aria-modal', 'true')
+  lb.innerHTML = `
+    <button class="lightbox-btn lightbox-close" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+    </button>
+    <button class="lightbox-btn lightbox-prev" aria-label="Previous image">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="lightbox-btn lightbox-next" aria-label="Next image">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="lightbox-stage">
+      <img src="" alt=""/>
+      <div class="lightbox-meta">
+        <span class="eyebrow"></span>
+        <span class="lightbox-title"></span>
+        <span class="lightbox-counter"></span>
+      </div>
+    </div>`
+  document.body.appendChild(lb)
+
+  const imgEl = lb.querySelector('img')
+  const eyebrowEl = lb.querySelector('.eyebrow')
+  const titleEl = lb.querySelector('.lightbox-title')
+  const counterEl = lb.querySelector('.lightbox-counter')
+
+  const show = (n) => {
+    i = (n + items.length) % items.length
+    const it = items[i]
+    imgEl.src = it.src
+    imgEl.alt = it.title
+    eyebrowEl.textContent = it.series
+    titleEl.textContent = it.title
+    counterEl.textContent = `${String(i + 1).padStart(2, '0')} / ${String(items.length).padStart(2, '0')}`
+  }
+
+  const open = (n) => {
+    lastFocused = document.activeElement
+    show(n)
+    lb.classList.add('is-open')
+    lb.setAttribute('aria-hidden', 'false')
+    document.body.style.overflow = 'hidden'
+    lb.querySelector('.lightbox-close').focus()
+  }
+  const close = () => {
+    lb.classList.remove('is-open')
+    lb.setAttribute('aria-hidden', 'true')
+    document.body.style.overflow = ''
+    if (lastFocused && lastFocused.focus) lastFocused.focus()
+  }
+
+  lightboxTriggers.forEach((el, idx) => {
+    el.addEventListener('click', () => open(idx))
+  })
+  lb.querySelector('.lightbox-close').addEventListener('click', close)
+  lb.querySelector('.lightbox-prev').addEventListener('click', () => show(i - 1))
+  lb.querySelector('.lightbox-next').addEventListener('click', () => show(i + 1))
+  lb.addEventListener('click', (e) => {
+    if (e.target === lb) close()
+  })
+  document.addEventListener('keydown', (e) => {
+    if (!lb.classList.contains('is-open')) return
+    if (e.key === 'Escape') close()
+    else if (e.key === 'ArrowLeft') show(i - 1)
+    else if (e.key === 'ArrowRight') show(i + 1)
+  })
+}
+
 /* ─── Year stamp in footer ─────────────────────────────────────────── */
 
 const yearEl = document.querySelectorAll('[data-year]')

@@ -1,11 +1,20 @@
 import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
 
 const r = (p) => fileURLToPath(new URL(p, import.meta.url))
 
 export default defineConfig({
-  plugins: [tailwindcss()],
+  plugins: [
+    tailwindcss(),
+    ViteImageOptimizer({
+      jpg: { quality: 82, mozjpeg: true },
+      jpeg: { quality: 82, mozjpeg: true },
+      png: { quality: 82, compressionLevel: 9 },
+      webp: { quality: 82 },
+    }),
+  ],
   build: {
     rollupOptions: {
       input: {

@@ -23,6 +23,7 @@ export default defineConfig({
         builds:   r('./builds/index.html'),
         gallery:  r('./gallery/index.html'),
         notes:    r('./notes/index.html'),
+        linkedinCallback: r('./linkedin/callback/index.html'),
         notFound: r('./404.html'),
       },
     },
